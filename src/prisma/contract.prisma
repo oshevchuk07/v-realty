@@ -1,0 +1,64 @@
+// use prisma-next
+
+enum DealType {
+  RENT
+  SALE
+}
+
+enum PropertyType {
+  APARTAMENT
+  HOUSE
+  COMMERCIAL
+  LAND
+}
+
+enum PropertyStatus {
+  DRAFT
+  ACTIVE
+  RESERVED
+  SOLD
+  RENTED
+}
+
+model Property {
+  id String @id @default(cuid())
+  dealType DealType
+  type PropertyType
+  status PropertyStatus @default(DRAFT)
+
+  priceUsd Int?
+  priceUah Int?
+
+  area Float
+  rooms Int?
+  floor Int?
+  totalFloors Int?
+
+  district String?
+  address String
+  description String @db.Text
+
+  images PropertyImage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, dealType])
+}
+
+model PropertyImage {
+  id String @id @default(cuid())
+
+  property Property @relation(fields: [propertyId], reference: [id], onDelete: Cascade)
+  propertyId String
+
+  url String
+  publicId String
+
+  isCover Boolean @default(false)
+  order Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([propertyId])
+}
