@@ -1,23 +1,20 @@
 import { Container } from '@/components/ui/container';
 import { FilterBar } from '@/components/property/filter-bar';
 import { PropertyCard } from '@/components/property/property-card';
-import { mockProperties } from '@/lib/mock-properties';
 import { DealType } from '@/types/property';
+import { getActiveProperties } from '@/server/properties';
 
 type SearchParams = { deal?: string };
 
-export default async function CatalogPage({
-  searchParams,
-}: {
+export type CatalogPageProps = {
   searchParams: Promise<SearchParams>;
-}) {
+};
+
+export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const { deal } = await searchParams;
   const dealFilter = deal === 'RENT' || deal === 'SALE' ? (deal as DealType) : 'ALL';
 
-  const properties =
-    dealFilter === 'ALL'
-      ? mockProperties
-      : mockProperties.filter((p) => p.dealType === dealFilter);
+  const properties = await getActiveProperties(dealFilter === 'ALL' ? undefined : dealFilter);
 
   return (
     <Container>

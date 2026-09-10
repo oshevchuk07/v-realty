@@ -2,11 +2,15 @@ import Link from 'next/link';
 import { ImageOff, BedDouble, Ruler, Building2 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/badge';
 import { PriceTag } from '@/components/ui/price-tag';
-import { MockProperty } from '@/lib/mock-properties';
+import { Property } from '@/generated/prisma/client';
 
 const DEAL_LABEL = { RENT: 'Оренда', SALE: 'Продаж' } as const;
 
-export function PropertyCard({ property }: { property: MockProperty }) {
+export type PropertyCardProps = {
+  property: Property;
+};
+
+export function PropertyCard({ property }: PropertyCardProps) {
   return (
     <Link
       href={`/objects/${property.id}`}
