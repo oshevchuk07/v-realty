@@ -6,10 +6,20 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+
+  --color-background: #1b1a18;
+  --color-surface: #242220;
+  --color-border: #38352f;
+  --color-text-primary: #f2efe9;
+  --color-text-secondary: #a8a399;
+  --color-accent: #c89b3c;
+  --color-accent-foreground: #1b1a18;
+
+  /* Status colors — used only on badges, never as decoration */
+  --color-status-active: #6b9a6f;
+  --color-status-reserved: #c89b3c;
+  --color-status-sold: #7a7570;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +30,7 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
 }
