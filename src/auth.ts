@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { prisma } from "./lib/prisma";
+import { UserRole } from "./generated/prisma/enums";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -9,29 +11,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: 'Email' },
         password: { label: 'Password', type: 'password' }
       },
-      // admin from .env variables
+
       authorize: async (credentials) => {
         const email = credentials?.email;
         const password = credentials?.password;
 
         if (typeof email !== 'string' || typeof password !== 'string') return null;
-        if (email !== process.env.ADMIN_EMAIL) return null;
 
-        const hash = process.env.ADMIN_PASSWORD_HASH;
-        console.log('DEBUG hash length:', hash?.length, 'expected ~60');
-        console.log('DEBUG hash exact:', JSON.stringify(hash));
-
-        try {
-          const isValid = await bcrypt.compare(password, hash!);
-          console.log('DEBUG: password valid?', isValid);
-          if (!isValid) return null;
-          return { id: 'admin', email };
-        } catch (err) {
-          console.log('DEBUG: bcrypt threw:', err);
-          return null;
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+          return null
         }
+
+        const isValid = await bcrypt.compare(password, user.passwordHash);
+        if (!isValid) {
+          return null
+        }
+
+        return { id: user.id, email: user.email, role: user.role };
       },
-    })
+    }),
   ],
   pages: {
     signIn: '/admin/login'
@@ -47,6 +46,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       if (isAdminRoute && !isLoginPage && !isLoggedIn) return false;
       return true;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role
+      }
+      return token
+    },
+    async session({ session, token }) {
+      session.user.id = token.id as string;
+      session.user.role = token.role as UserRole;
+      return session;
     },
   }
 })

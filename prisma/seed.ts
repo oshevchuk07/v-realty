@@ -1,7 +1,24 @@
 import 'dotenv/config';
 import { prisma } from '../src/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 async function main() {
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@mail.com';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'changeme123';
+
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      passwordHash: await bcrypt.hash(adminPassword, 10),
+      role: 'ADMIN',
+    },
+  });
+
+  console.log(`Admin user ready: ${adminEmail} / ${adminPassword}`);
+
+
   await prisma.propertyImage.deleteMany();
   await prisma.property.deleteMany();
 
