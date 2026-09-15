@@ -1,5 +1,6 @@
 import type { DealType } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { cache } from "react";
 
 export async function getActiveProperties(dealType?: DealType) {
   return prisma.property.findMany({
@@ -19,7 +20,7 @@ export async function getActiveProperties(dealType?: DealType) {
   })
 }
 
-export async function getPropertyById(id: string) {
+export const getPropertyById = cache(async (id: string) => {
   return prisma.property.findFirst({
     where: { id, status: 'ACTIVE' },
     include: {
@@ -30,4 +31,4 @@ export async function getPropertyById(id: string) {
       }
     }
   })
-}
+})

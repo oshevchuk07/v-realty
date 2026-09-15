@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/container';
 import { StatusBadge } from '@/components/ui/badge';
 import { PriceTag } from '@/components/ui/price-tag';
 import { getPropertyById } from '@/server/properties';
+import { Metadata } from 'next';
 
 const DEAL_LABEL = { RENT: 'Оренда', SALE: 'Продаж' } as const;
 const TYPE_LABEL = {
@@ -12,6 +13,31 @@ const TYPE_LABEL = {
   COMMERCIAL: 'Комерція',
   LAND: 'Ділянка',
 } as const;
+
+const DEAL_LABEL_META = { RENT: 'Оренда', SALE: 'Продаж' } as const;
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const property = await getPropertyById(id);
+
+  if (!property) {
+    return { title: "Об'єкт не знайдено" };
+  }
+
+  const priceLabel = property.priceUsd ? `$${property.priceUsd.toLocaleString('en-US')}` : '';
+  const title = `${DEAL_LABEL_META[property.dealType]}: ${property.address} — ${priceLabel}`;
+  const description = property.description.slice(0, 155);
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: property.images?.[0] ? [property.images[0].url] : [],
+    },
+  };
+}
 
 export type PropertyDetailPageProps = {
   params: Promise<{ id: string }>;

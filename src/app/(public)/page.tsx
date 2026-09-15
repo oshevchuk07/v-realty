@@ -3,8 +3,14 @@ import { FilterBar } from '@/components/property/filter-bar';
 import { PropertyCard } from '@/components/property/property-card';
 import { DealType } from '@/types/property';
 import { getActiveProperties } from '@/server/properties';
+import { Metadata } from 'next';
 
 type SearchParams = { deal?: string };
+
+export const metadata: Metadata = {
+  title: "Об'єкти нерухомості — оренда та продаж",
+  description: 'Актуальні квартири, будинки та комерційна нерухомість в оренду й на продаж.',
+};
 
 export type CatalogPageProps = {
   searchParams: Promise<SearchParams>;
