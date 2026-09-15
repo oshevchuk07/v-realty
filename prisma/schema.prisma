@@ -75,7 +75,8 @@ model Property {
   address     String
   description String  @db.Text
 
-  images PropertyImage[]
+  images       PropertyImage[]
+  leadRequests LeadRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,6 +94,21 @@ model PropertyImage {
 
   isCover Boolean @default(false)
   order   Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([propertyId])
+}
+
+model LeadRequest {
+  id String @id @default(uuid())
+
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  name    String
+  phone   String
+  message String?
 
   createdAt DateTime @default(now())
 

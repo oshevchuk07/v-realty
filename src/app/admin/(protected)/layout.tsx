@@ -16,6 +16,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin" className="text-sm text-text-secondary hover:text-text-primary">
             Об&apos;єкти
           </Link>
+          <Link href="/admin/leads" className="text-sm text-text-secondary hover:text-text-primary">
+            Заявки
+          </Link>
           <Link href="/admin/settings" className="text-sm text-text-secondary hover:text-text-primary">
             Налаштування
           </Link>

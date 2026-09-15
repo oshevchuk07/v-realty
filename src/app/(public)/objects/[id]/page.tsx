@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/ui/badge';
 import { PriceTag } from '@/components/ui/price-tag';
 import { getPropertyById } from '@/server/properties';
 import { Metadata } from 'next';
+import { LeadForm } from '@/components/property/lead-form';
 
 const DEAL_LABEL = { RENT: 'Оренда', SALE: 'Продаж' } as const;
 const TYPE_LABEL = {
@@ -102,6 +103,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
           <a href="tel:+380000000000" className="mt-2 block text-accent">
             +380 00 000 00 00
           </a>
+          <LeadForm propertyId={property.id} />
         </aside>
       </div>
     </Container>
