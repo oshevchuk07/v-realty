@@ -7,7 +7,15 @@ export async function getActiveProperties(dealType?: DealType) {
       status: 'ACTIVE',
       ...(dealType ? { dealType } : {})
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    include: {
+      images: {
+        where: {
+          isCover: true
+        },
+        take: 1
+      }
+    }
   })
 }
 

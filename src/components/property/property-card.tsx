@@ -2,12 +2,17 @@ import Link from 'next/link';
 import { ImageOff, BedDouble, Ruler, Building2 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/badge';
 import { PriceTag } from '@/components/ui/price-tag';
-import { Property } from '@/generated/prisma/client';
+import { Prisma, Property } from '@/generated/prisma/client';
+import Image from 'next/image';
 
 const DEAL_LABEL = { RENT: 'Оренда', SALE: 'Продаж' } as const;
 
+type PropertyWithCover = Prisma.PropertyGetPayload<{
+  include: { images: true };
+}>;
+
 export type PropertyCardProps = {
-  property: Property;
+  property: PropertyWithCover;
 };
 
 export function PropertyCard({ property }: PropertyCardProps) {
@@ -17,8 +22,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
       className="group block overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-accent"
     >
       {/* Placeholder until Cloudinary image pipeline is wired up */}
-      <div className="flex aspect-[4/3] items-center justify-center bg-background text-text-secondary">
-        <ImageOff className="h-8 w-8" />
+      <div className="relative aspect-[4/3] bg-background">
+        {property.images?.[0] ? (
+          <Image src={property.images[0].url} alt={property.address} fill className="object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center text-text-secondary">
+            <ImageOff className="h-8 w-8" />
+          </div>
+        )}
       </div>
 
       <div className="space-y-3 p-4">

@@ -1,4 +1,8 @@
+'use client';
+
 import type { Property } from '@/generated/prisma/client';
+import { PropertyFormState } from '@/server/admin-properties';
+import { useActionState } from 'react';
 
 const DEAL_OPTIONS = [
   { value: 'SALE', label: 'Продаж' },
@@ -29,9 +33,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export function PropertyForm({ property, action }: { property?: Property; action: (formData: FormData) => void }) {
+export function PropertyForm({
+  property,
+  action,
+}: {
+  property?: Property;
+  action: (state: PropertyFormState, formData: FormData) => Promise<PropertyFormState>;
+}) {
+  const [state, formAction] = useActionState(action, {});
+
   return (
-    <form action={action} className="max-w-2xl space-y-4">
+    <form action={formAction} className="max-w-2xl space-y-4">
+      {state.error && <p className="rounded border border-red-400/40 bg-red-400/10 px-3 py-2 text-sm text-red-400">{state.error}</p>}
       <div className="grid grid-cols-2 gap-4">
         <Field label="Тип угоди">
           <select name="dealType" defaultValue={property?.dealType ?? 'SALE'} className={inputClass}>

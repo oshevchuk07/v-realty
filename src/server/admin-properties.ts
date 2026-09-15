@@ -40,24 +40,54 @@ function parseFormData(formData: FormData) {
   });
 }
 
-export async function createProperty(formData: FormData) {
+export type PropertyFormState = {
+  error?: string;
+};
+
+export async function createProperty(
+  _prevState: PropertyFormState,
+  formData: FormData,
+): Promise<PropertyFormState> {
   await requireAdmin();
-  const data = parseFormData(formData);
 
-  await prisma.property.create({ data });
+  const parsed = propertySchema.safeParse(buildRawData(formData));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
+  }
 
+  await prisma.property.create({ data: parsed.data });
   revalidatePath('/admin');
   redirect('/admin');
 }
 
-export async function updateProperty(id: string, formData: FormData) {
+export async function updateProperty(
+  id: string,
+  _prevState: PropertyFormState,
+  formData: FormData,
+): Promise<PropertyFormState> {
   await requireAdmin();
-  const data = parseFormData(formData);
 
-  await prisma.property.update({ where: { id }, data });
+  const parsed = propertySchema.safeParse(buildRawData(formData));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
+  }
 
+  await prisma.property.update({ where: { id }, data: parsed.data });
   revalidatePath('/admin');
   redirect('/admin');
+}
+
+// Renamed from parseFormData — now just builds the raw object, validation happens above
+function buildRawData(formData: FormData) {
+  const raw = Object.fromEntries(formData.entries());
+  return {
+    ...raw,
+    priceUsd: raw.priceUsd || null,
+    priceUah: raw.priceUah || null,
+    rooms: raw.rooms || null,
+    floor: raw.floor || null,
+    totalFloors: raw.totalFloors || null,
+  };
 }
 
 export async function deleteProperty(id: string) {
