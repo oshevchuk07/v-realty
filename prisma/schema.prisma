@@ -109,8 +109,10 @@ model LeadRequest {
   name    String
   phone   String
   message String?
+  ip      String?
 
   createdAt DateTime @default(now())
 
+  @@index([ip, createdAt])
   @@index([propertyId])
 }

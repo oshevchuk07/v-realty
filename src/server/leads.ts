@@ -1,19 +1,34 @@
 'use server'
 
 import { prisma } from "@/lib/prisma";
+import { headers } from "next/headers";
 import z from "zod"
+
+const RATE_LIMIT_WINDOW_MINUTES = 10;
+const RATE_LIMIT_MAX_REQUESTS = 3;
 
 const leadSchema = z.object({
   name: z.string().min(2, 'Вкажіть Ім’я'),
   phone: z.string().min(7, 'Вкажи номер телефону'),
   message: z.string().optional(),
   propertyId: z.string().optional(),
+  // Hidden honeypot field — real visitors never see or fill it (hidden via CSS,
+  // not `type="hidden"`, so basic bots that skip hidden inputs still get caught)
+  website: z.string().optional(),
 })
 
 export type LeadFormState = {
   error?: string;
   success?: boolean;
 };
+
+async function getClientIp(): Promise<string> {
+  const headersList = await headers();
+  // Vercel sets x-forwarded-for; first entry is the original client
+  const forwardedFor = headersList.get('x-forwarded-for');
+  return forwardedFor?.split(',')[0]?.trim() ?? 'unknown';
+}
+
 
 // Telegram delivery is best-effort — a failed notification should never block
 // saving the lead itself, since the DB record is the source of truth
@@ -42,7 +57,24 @@ export async function createLead(
     return { error: parsed.error.issues[0].message };
   }
 
-  const { name, phone, message, propertyId } = parsed.data;
+  const { name, phone, message, propertyId, website } = parsed.data;
+
+  // Honeypot triggered — silently pretend success so bots don't learn to adapt
+  if (website) {
+    return { success: true };
+  }
+
+  const ip = await getClientIp();
+  const recentCount = await prisma.leadRequest.count({
+    where: {
+      ip,
+      createdAt: { gte: new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000) },
+    },
+  });
+
+  if (recentCount >= RATE_LIMIT_MAX_REQUESTS) {
+    return { error: 'Забагато заявок поспіль. Спробуйте пізніше або зателефонуйте напряму.' };
+  }
 
   let propertyLabel = '';
   if (propertyId) {

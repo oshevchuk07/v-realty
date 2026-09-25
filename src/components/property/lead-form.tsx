@@ -37,6 +37,15 @@ export function LeadForm({ propertyId }: { propertyId?: string }) {
         rows={2}
         className="w-full rounded border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent"
       />
+      {/* Honeypot — visually hidden, not display:none (some bots skip display:none) */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+        aria-hidden="true"
+      />
 
       <button type="submit" className="w-full rounded bg-accent px-3 py-2 text-sm font-medium text-accent-foreground">
         Залишити заявку
