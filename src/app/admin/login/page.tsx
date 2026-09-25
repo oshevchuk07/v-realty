@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { AuthError } from 'next-auth';
 import { signIn } from '@/auth';
+import Link from 'next/link';
 
 export type LoginPageProps = {
   searchParams: Promise<{ error?: string }>;
@@ -49,6 +50,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <button type="submit" className="w-full rounded bg-accent px-3 py-2 font-medium text-accent-foreground">
           Увійти
         </button>
+
+        <div className="flex justify-between text-sm">
+          <Link href="/admin/forgot-password" className="text-text-secondary hover:text-text-primary">
+            Забули пароль?
+          </Link>
+        </div>
       </form>
     </div>
   );
