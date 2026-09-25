@@ -57,10 +57,14 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 }
 
+// Site Setting
 model SiteSettings {
   id Int @id @default(1) //singleton - we must have olvays one record with id = 1;
 
-  siteName       String  @default("Нерухомість")
+  siteName    String  @default("Нерухомість")
+  logoUrl     String?
+  accentColor String  @default("#c89b3c")
+
   seoTitle       String?
   seoDescription String?
 
@@ -75,6 +79,7 @@ model SiteSettings {
   updatedAt DateTime @updatedAt
 }
 
+// 
 model Property {
   id       String         @id @default(cuid())
   dealType DealType

@@ -10,6 +10,8 @@ export const getSiteSettings = cache(async () => {
     settings ?? {
       id: 1,
       siteName: 'Нерухомість',
+      logoUrl: null,
+      accentColor: '#c89b3c',
       seoTitle: null,
       seoDescription: null,
       contactPhone: null,

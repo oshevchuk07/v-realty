@@ -8,6 +8,10 @@ yarn start
 ```
 yarn prisma migrate dev --create-only --name add_feature_name
 ```
+check migration file and them:
+```
+yarn prisma migrate dev
+```
 
 # migration status
 ```
