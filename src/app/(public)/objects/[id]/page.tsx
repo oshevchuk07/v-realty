@@ -6,6 +6,7 @@ import { PriceTag } from '@/components/ui/price-tag';
 import { getPropertyById } from '@/server/properties';
 import { Metadata } from 'next';
 import { LeadForm } from '@/components/property/lead-form';
+import { getSiteSettings } from '@/server/site-settings';
 
 const DEAL_LABEL = { RENT: 'Оренда', SALE: 'Продаж' } as const;
 const TYPE_LABEL = {
@@ -47,6 +48,7 @@ export type PropertyDetailPageProps = {
 export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
   const { id } = await params;
   const property = await getPropertyById(id);
+  const settings = await getSiteSettings();
 
   if (!property) {
     notFound();
@@ -100,8 +102,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
         {/* Contact block — sticky on desktop, stacks below content on mobile */}
         <aside className="h-fit rounded-lg border border-border bg-surface p-4 lg:sticky lg:top-6">
           <p className="font-medium">Зв&apos;язатись</p>
-          <a href="tel:+380000000000" className="mt-2 block text-accent">
-            +380 00 000 00 00
+          <a href={`tel:${settings.contactPhone}`} className="mt-2 block text-accent">
+            {settings.contactPhone}
           </a>
           <LeadForm propertyId={property.id} />
         </aside>

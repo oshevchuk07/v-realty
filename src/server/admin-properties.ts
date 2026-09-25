@@ -1,10 +1,10 @@
 'use server';
 
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import z from "zod";
+import { requireAdmin } from "./require-admin";
 
 const propertySchema = z.object({
   dealType: z.enum(['RENT', 'SALE']),
@@ -20,13 +20,6 @@ const propertySchema = z.object({
   address: z.string().min(3),
   description: z.string().min(10),
 });
-
-// proxy.ts already blocks unauthenticated page loads, but Server Actions can in
-// principle be invoked directly — this is the real gate for mutations
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) redirect('/admin/login');
-}
 
 function parseFormData(formData: FormData) {
   const raw = Object.fromEntries(formData.entries());
@@ -92,6 +85,7 @@ function buildRawData(formData: FormData) {
 
 export async function deleteProperty(id: string) {
   await requireAdmin();
+
   await prisma.property.delete({ where: { id } });
   revalidatePath('/admin');
 }

@@ -2,9 +2,13 @@ import { redirect } from 'next/navigation';
 import bcrypt from 'bcryptjs';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { getSiteSettings } from '@/server/site-settings';
+import { SiteSettingsForm } from '@/components/admin/site-settings-form';
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ success?: string; error?: string }> }) {
   const { success, error } = await searchParams;
+
+  const settings = await getSiteSettings();
 
   async function changePassword(formData: FormData) {
     'use server';
@@ -36,6 +40,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
       {success && <p className="text-sm text-status-active">Пароль оновлено</p>}
       {error && <p className="text-sm text-red-400">Поточний пароль невірний</p>}
+
+      <div className="mb-8">
+        <h2 className="mb-4 text-lg font-semibold">Налаштування сайту</h2>
+        <SiteSettingsForm settings={settings} />
+      </div>
 
       <form action={changePassword} className="space-y-3">
         <input

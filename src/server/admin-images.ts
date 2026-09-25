@@ -1,15 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { cloudinary } from '@/lib/cloudinary';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/auth';
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) redirect('/admin/login');
-}
+import { requireAdmin } from './require-admin';
 
 export async function uploadPropertyImage(propertyId: string, formData: FormData) {
   await requireAdmin();

@@ -57,6 +57,24 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 }
 
+model SiteSettings {
+  id Int @id @default(1) //singleton - we must have olvays one record with id = 1;
+
+  siteName       String  @default("Нерухомість")
+  seoTitle       String?
+  seoDescription String?
+
+  contactPhone   String?
+  contactEmail   String?
+  contactAddress String?
+
+  socialFacebook  String?
+  socialInstagram String?
+  socialTelegram  String?
+
+  updatedAt DateTime @updatedAt
+}
+
 model Property {
   id       String         @id @default(cuid())
   dealType DealType

@@ -18,6 +18,16 @@ async function main() {
 
   console.log(`Admin user ready: ${adminEmail} / ${adminPassword}`);
 
+  await prisma.siteSettings.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      siteName: 'Нерухомість',
+      contactPhone: '+380000000000',
+    },
+  });
+
 
   await prisma.propertyImage.deleteMany();
   await prisma.property.deleteMany();
