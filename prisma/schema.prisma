@@ -12,6 +12,13 @@ datasource db {
   provider = "postgresql"
 }
 
+enum BlockType {
+  HERO_BANNER
+  HORIZONTAL_SLIDER
+  ITEM_GRID
+  IMAGE_TEXT
+}
+
 enum DealType {
   RENT
   SALE
@@ -77,6 +84,20 @@ model SiteSettings {
   socialTelegram  String?
 
   updatedAt DateTime @updatedAt
+}
+
+model PageBlock {
+  id        String    @id @default(uuid())
+  page      String    @default("main")
+  type      BlockType
+  order     Int
+  isVisible Boolean   @default(true)
+  data      Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([page, order])
 }
 
 // 

@@ -28,6 +28,22 @@ async function main() {
     },
   });
 
+  // blocks
+  await prisma.pageBlock.deleteMany();
+
+  await prisma.pageBlock.create({
+    data: {
+      page: 'home',
+      type: 'HERO_BANNER',
+      order: 0,
+      data: {
+        imageUrl: 'https://placehold.co/1600x600',
+        title: 'Знайдіть свою нерухомість',
+        subtitle: 'Оренда та продаж квартир і будинків',
+      },
+    },
+  });
+
 
   await prisma.propertyImage.deleteMany();
   await prisma.property.deleteMany();

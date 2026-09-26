@@ -34,3 +34,5 @@ node -e "require('bcryptjs').hash(process.argv[1], 10).then(console.log)" "passw
 ```
 npx auth secret
 ```
+# prisma studio
+yarn prisma studio
