@@ -4,6 +4,8 @@ import { PropertyCard } from '@/components/property/property-card';
 import { DealType } from '@/types/property';
 import { getActiveProperties } from '@/server/properties';
 import { Metadata } from 'next';
+import { prisma } from '@/lib/prisma';
+import { BlockRenderer } from '@/components/blocks/block-renderer.';
 
 type SearchParams = { deal?: string };
 
@@ -17,6 +19,11 @@ export type CatalogPageProps = {
 };
 
 export default async function CatalogPage({ searchParams }: CatalogPageProps) {
+  const blocks = await prisma.pageBlock.findMany({
+    where: { page: 'home', isVisible: true },
+    orderBy: { order: 'asc' },
+  });
+
   const { deal } = await searchParams;
   const dealFilter = deal === 'RENT' || deal === 'SALE' ? (deal as DealType) : 'ALL';
 
@@ -24,6 +31,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   return (
     <Container>
+      <div className="mb-8 space-y-6">
+        {blocks.map((block) => (
+          <BlockRenderer key={block.id} block={block} />
+        ))}
+      </div>
+
       <div className="mb-6 space-y-4">
         <h1 className="text-2xl font-semibold">Об'єкти</h1>
         <FilterBar active={dealFilter} />
