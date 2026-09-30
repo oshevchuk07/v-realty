@@ -80,3 +80,25 @@ export async function uploadBlockImage(
   const uploaded = await cloudinary.uploader.upload(dataUri, { folder: 'blocks' });
   return { url: uploaded.secure_url };
 }
+
+export async function toggleBlockVisibility(id: string, isVisible: boolean) {
+  await requireAdmin();
+  await prisma.pageBlock.update({ where: { id }, data: { isVisible } });
+  revalidatePath('/admin/blocks');
+  revalidatePath('/');
+}
+
+// Receives the full new order as a list of block ids and persists it in one
+// transaction — cheaper and safer than one update per dragged item
+export async function reorderBlocks(orderedIds: string[]) {
+  await requireAdmin();
+
+  await prisma.$transaction(
+    orderedIds.map((id, index) =>
+      prisma.pageBlock.update({ where: { id }, data: { order: index } }),
+    ),
+  );
+
+  revalidatePath('/admin/blocks');
+  revalidatePath('/');
+}

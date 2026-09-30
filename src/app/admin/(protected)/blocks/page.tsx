@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { BLOCK_REGISTRY } from '@/lib/blocks/registry';
-import { DeleteBlockButton } from '@/components/admin/delete-block-button';
+import { SortableBlockList } from '@/components/admin/sortable-block-list';
 
 export default async function BlocksPage() {
   const blocks = await prisma.pageBlock.findMany({
@@ -18,20 +17,11 @@ export default async function BlocksPage() {
         </Link>
       </div>
 
-      <div className="space-y-2">
-        {blocks.map((block) => (
-          <div key={block.id} className="flex items-center justify-between rounded border border-border p-3">
-            <span>{BLOCK_REGISTRY[block.type].label}</span>
-            <div className="flex items-center gap-3">
-              <Link href={`/admin/blocks/${block.id}/edit`} className="text-sm text-accent hover:underline">
-                Редагувати
-              </Link>
-              <DeleteBlockButton id={block.id} />
-            </div>
-          </div>
-        ))}
-        {blocks.length === 0 && <p className="text-text-secondary">Блоків ще немає</p>}
-      </div>
+      {blocks.length === 0 ? (
+        <p className="text-text-secondary">Блоків ще немає</p>
+      ) : (
+        <SortableBlockList initialBlocks={blocks} />
+      )}
     </div>
   );
 }
