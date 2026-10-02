@@ -31,11 +31,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   return (
     <Container>
-      <div className="mb-8 space-y-6">
-        {blocks.map((block) => (
-          <BlockRenderer key={block.id} block={block} />
-        ))}
-      </div>
+      {blocks.length > 0 && (
+        <div className="mb-8 space-y-6">
+          {blocks.map((block) => (
+            <BlockRenderer key={block.id} block={block} />
+          ))}
+        </div>
+      )}
 
       <div className="mb-6 space-y-4">
         <h1 className="text-2xl font-semibold">Об'єкти</h1>
