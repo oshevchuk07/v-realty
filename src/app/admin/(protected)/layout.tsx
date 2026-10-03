@@ -25,6 +25,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/blocks" className="text-sm text-text-secondary hover:text-text-primary">
             Блоки
           </Link>
+          <Link href="/admin/admins" className="text-sm text-text-secondary hover:text-text-primary">
+            Адміни
+          </Link>
         </nav>
         <form
           action={async () => {

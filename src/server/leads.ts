@@ -1,5 +1,6 @@
 'use server'
 
+import { DealType } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import z from "zod"
@@ -48,6 +49,35 @@ async function notifyTelegram(text: string) {
   }
 }
 
+async function sendTelegramMessage(chatId: string, text: string) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+    });
+  } catch (err) {
+    console.error('Telegram notify failed:', err);
+  }
+}
+
+async function notifyAdmins(text: string, dealType: DealType | null) {
+  const recipients = await prisma.user.findMany({
+    where: {
+      isActive: true,
+      telegramChatId: { not: null },
+      ...(dealType ? { notifyDealTypes: { has: dealType } } : {}),
+    },
+  });
+
+  await Promise.all(
+    recipients.map((admin) => sendTelegramMessage(admin.telegramChatId!, text)),
+  );
+}
+
 export async function createLead(
   _prevState: LeadFormState,
   formData: FormData,
@@ -76,14 +106,25 @@ export async function createLead(
     return { error: 'Забагато заявок поспіль. Спробуйте пізніше або зателефонуйте напряму.' };
   }
 
+  // let propertyLabel = '';
+  // if (propertyId) {
+  //   const property = await prisma.property.findUnique({ where: { id: propertyId } });
+  //   if (property) propertyLabel = `\n📍 ${property.address}`;
+  // }
+
   let propertyLabel = '';
+  let dealType: DealType | null = null;
+
   if (propertyId) {
     const property = await prisma.property.findUnique({ where: { id: propertyId } });
-    if (property) propertyLabel = `\n📍 ${property.address}`;
+    if (property) {
+      propertyLabel = `\n📍 ${property.address}`;
+      dealType = property.dealType;
+    }
   }
 
   await prisma.leadRequest.create({
-    data: { name, phone, message, propertyId: propertyId || null },
+    data: { name, phone, message, propertyId: propertyId || null, ip },
   });
 
   await notifyTelegram(

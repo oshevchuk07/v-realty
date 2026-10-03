@@ -8,4 +8,6 @@ export async function requireAdmin() {
   if (!session?.user) {
     redirect('/admin/login')
   }
+
+  return session;
 }
